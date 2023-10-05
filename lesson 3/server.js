@@ -9,7 +9,6 @@ class Emitter extends EventEmitter { };
 // initialize object 
 const myEmitter = new Emitter();
 myEmitter.on('log', (msg, fileName) => logEvents(msg, fileName));
-
 const PORT = process.env.PORT || 3500;
 
 const serveFile = async (filePath, contentType, response) => {
@@ -24,7 +23,7 @@ const serveFile = async (filePath, contentType, response) => {
             filePath.includes('404.html') ? 404 : 200,
             { 'Content-Type': contentType }
         );
-        response.end(
+         response.end(
             contentType === 'application/json' ? JSON.stringify(data) : data
         );
     } catch (err) {
@@ -38,7 +37,6 @@ const serveFile = async (filePath, contentType, response) => {
 const server = http.createServer((req, res) => {
     console.log(req.url, req.method);
     myEmitter.emit('log', `${req.url}\t${req.method}`, 'reqLog.txt');
-
     const extension = path.extname(req.url);
 
     let contentType;
@@ -75,27 +73,14 @@ const server = http.createServer((req, res) => {
                     ? path.join(__dirname, 'views', req.url)
                     : path.join(__dirname, req.url);
 
-
     // makes .html extension not required in the browser
     if (!extension && req.url.slice(-1) !== '/') filePath += '.html';
-    
-    
-  
-    
+
     const fileExists = fs.existsSync(filePath);
-    
+
     if (fileExists) {
-
-
-
         serveFile(filePath, contentType, res);
-        console.log(serveFile)
-    
-    
-    
-    
     } else {
-        console.log(serveFile, path.parse(filePath).base)
         switch (path.parse(filePath).base) {
             case 'old-page.html':
                 res.writeHead(301, { 'Location': '/new-page.html' });
@@ -108,7 +93,6 @@ const server = http.createServer((req, res) => {
             default:
                 serveFile(path.join(__dirname, 'views', '404.html'), 'text/html', res);
         }
-    } 
-
+    }
 });
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
